@@ -703,6 +703,18 @@ input[type="range"] {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.task-list textarea,
+.role-grid textarea,
+.reflection-card textarea {
+  margin-top: 12px;
+}
+
+.task-list .button,
+.role-grid .button,
+.reflection-card .button {
+  margin-top: 10px;
+}
+
 .role-grid span,
 .task-list strong {
   color: var(--accent-2);

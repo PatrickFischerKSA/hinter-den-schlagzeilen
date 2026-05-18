@@ -150,6 +150,43 @@ function scoreTask(text, item) {
   return { signals, passed, wordCount, keywordHits };
 }
 
+function scoreWriting(text, criteria, keywords = []) {
+  const normalized = text.toLowerCase();
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  const keywordHits = keywords.filter((keyword) => normalized.includes(keyword)).length;
+  const signals = [
+    { label: "ausreichend konkret", passed: wordCount >= 35 },
+    { label: "mit Fachbegriffen oder präzisen Formulierungen", passed: keywordHits >= 2 },
+    ...criteria.map((criterion) => ({
+      label: criterion,
+      passed: normalized.includes(criterion.toLowerCase().split(" ")[0]) || keywordHits >= 3
+    }))
+  ];
+  return { signals, passed: signals.filter((signal) => signal.passed).length, wordCount, keywordHits };
+}
+
+function feedbackBlock(result, horizon, followUp = "") {
+  const strong = result.passed >= Math.ceil(result.signals.length * 0.65);
+  return `
+    <div class="answer-feedback ${strong ? "correct" : "develop"}">
+      <strong>${strong ? "Gewürdigt: tragfähiger Arbeitsstand" : "Gewürdigt: Ansatz sichtbar, bitte schärfen"}</strong>
+      <p>${result.wordCount} Wörter, ${result.keywordHits} relevante Fachsignale. Die Rückmeldung prüft Struktur und Begründung, nicht deine Meinung.</p>
+      <ul class="criteria-list">
+        ${result.signals.map((signal) => (
+          "<li class=\"" + (signal.passed ? "met" : "") + "\">" +
+          (signal.passed ? "✓" : "○") + " " + escapeHtml(signal.label) +
+          "</li>"
+        )).join("")}
+      </ul>
+      <details>
+        <summary>Rückmeldehorizont anzeigen</summary>
+        <p>${escapeHtml(horizon)}</p>
+      </details>
+      ${followUp ? `<p class="follow-up">${escapeHtml(followUp)}</p>` : ""}
+    </div>
+  `;
+}
+
 function renderTasks(items = data.securityTasks) {
   const grid = $("#task-grid");
   if (!grid) return;
@@ -269,7 +306,7 @@ function renderSourceLab() {
     <button type="button" data-source="${index}" class="${state.sourceChoices[index] ? "is-selected" : ""}">
       <span>${escapeHtml(source.title)}</span>
       <meter min="0" max="100" value="${source.strength}"></meter>
-      <small>${escapeHtml(source.verdict)}</small>
+      <small>${escapeHtml(state.sourceChoices[index] ? `${source.verdict}: ${source.note}` : source.verdict)}</small>
     </button>
   `).join("");
 
@@ -323,6 +360,17 @@ function renderDilemmas() {
   if (!grid) return;
   grid.innerHTML = data.dilemmas.map((dilemma) => {
     const saved = state.dilemmas[dilemma.id] || { value: 50, reason: "" };
+    const result = saved.checked
+      ? scoreWriting(saved.reason, ["Position begründet", "Gegenwert berücksichtigt", "journalistisches Prinzip genannt"], ["öffentlich", "interesse", "privat", "quelle", "prüfung", "fair", "schutz", "kontext", "verhältnismäßig"])
+      : null;
+    const stance = saved.value < 35 ? dilemma.left : saved.value > 65 ? dilemma.right : "abwägende Zwischenposition";
+    const feedback = result
+      ? feedbackBlock(
+        result,
+        `Deine Position liegt bei: ${stance}. Stark wird die Begründung, wenn sie nicht nur eine Seite bevorzugt, sondern den Verlust auf der anderen Seite sichtbar macht.`,
+        "Revidiere deine Entscheidung nach dem Lesen des Rückmeldehorizonts: Würdest du den Regler gleich lassen?"
+      )
+      : "";
     return `
       <article class="dilemma-card">
         <h3>${escapeHtml(dilemma.title)}</h3>
@@ -338,6 +386,7 @@ function renderDilemmas() {
         </label>
         <button class="button small" type="button" data-dilemma-save="${dilemma.id}">Entscheidung sichern</button>
         <p class="ethic-advice">${escapeHtml(dilemma.advice)}</p>
+        ${feedback}
       </article>
     `;
   }).join("");
@@ -347,10 +396,11 @@ function renderDilemmas() {
       const id = button.dataset.dilemmaSave;
       state.dilemmas[id] = {
         value: Number($(`[data-dilemma-range="${id}"]`).value),
-        reason: $(`[data-dilemma-reason="${id}"]`).value.trim()
+        reason: $(`[data-dilemma-reason="${id}"]`).value.trim(),
+        checked: true
       };
       saveState();
-      button.textContent = "Gesichert";
+      renderDilemmas();
       renderPortfolio();
     });
   });
@@ -360,11 +410,13 @@ function renderTransfer() {
   $("#tab-seminar").innerHTML = `
     <div class="question-grid">
       ${data.seminarQuestions.map((question, index) => `
-        <label class="reflection-card">
+        <article class="reflection-card">
           <span>${String(index + 1).padStart(2, "0")}</span>
           <strong>${escapeHtml(question)}</strong>
           <textarea rows="4" data-reflection="seminar-${index}" placeholder="Antwort, Beleg aus dem Film, eigene Position">${escapeHtml(state.reflections[`seminar-${index}`] || "")}</textarea>
-        </label>
+          <button class="button small" type="button" data-feedback="seminar-${index}">Antwort würdigen</button>
+          <div data-feedback-output="seminar-${index}">${renderStoredFeedback(`seminar-${index}`, "Eine starke Seminarantwort verbindet eine klare These mit einem Filmbeleg und einer Gegenfrage. Sie darf offen bleiben, muss aber zeigen, woran weitergedacht werden soll.")}</div>
+        </article>
       `).join("")}
     </div>
   `;
@@ -374,16 +426,22 @@ function renderTransfer() {
         <article>
           <strong>Auftrag ${index + 1}</strong>
           <p>${escapeHtml(task)}</p>
+          <textarea rows="5" data-reflection="production-${index}" placeholder="Entwurf, Plan, Begründung oder Ergebnis festhalten">${escapeHtml(state.reflections[`production-${index}`] || "")}</textarea>
+          <button class="button small" type="button" data-feedback="production-${index}">Auftrag würdigen</button>
+          <div data-feedback-output="production-${index}">${renderStoredFeedback(`production-${index}`, "Ein guter Produktionsstand macht Ziel, Material, Quellenlage und journalistische Entscheidung sichtbar. Das Produkt muss nicht fertig sein, aber sein Qualitätsmaßstab muss erkennbar werden.")}</div>
         </article>
       `).join("")}
     </div>
   `;
   $("#tab-debate").innerHTML = `
     <div class="role-grid">
-      ${data.debateRoles.map((role) => `
+      ${data.debateRoles.map((role, index) => `
         <article>
           <span>${escapeHtml(role.role)}</span>
           <p>${escapeHtml(role.goal)}</p>
+          <textarea rows="5" data-reflection="debate-${index}" placeholder="Position, stärkstes Argument, mögliche Schwäche">${escapeHtml(state.reflections[`debate-${index}`] || "")}</textarea>
+          <button class="button small" type="button" data-feedback="debate-${index}">Rollenargument würdigen</button>
+          <div data-feedback-output="debate-${index}">${renderStoredFeedback(`debate-${index}`, "Ein starkes Rollenargument erfüllt das eigene Ziel, nimmt aber mindestens eine Gegenposition ernst. So entsteht eine echte Redaktionskonferenz statt Rollenbehauptung.")}</div>
         </article>
       `).join("")}
     </div>
@@ -396,6 +454,18 @@ function renderTransfer() {
     });
   });
 
+  $$("[data-feedback]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.feedback;
+      const field = $(`[data-reflection="${key}"]`);
+      state.reflections[key] = field.value;
+      state.reflections[`${key}-checked`] = "true";
+      saveState();
+      renderTransfer();
+      renderPortfolio();
+    });
+  });
+
   $$(".tab").forEach((tab) => {
     tab.addEventListener("click", () => {
       $$(".tab").forEach((item) => item.classList.toggle("is-active", item === tab));
@@ -404,12 +474,26 @@ function renderTransfer() {
   });
 }
 
+function renderStoredFeedback(key, horizon) {
+  if (state.reflections[`${key}-checked`] !== "true") return "";
+  const text = state.reflections[key] || "";
+  const result = scoreWriting(
+    text,
+    ["Bezug zum Film oder Auftrag", "eigene Position", "Begründung oder Qualitätsmaßstab"],
+    ["film", "quelle", "beleg", "recherche", "öffentlichkeit", "ethik", "fair", "vertrauen", "position", "argument"]
+  );
+  return feedbackBlock(result, horizon, "Überarbeite den Text so, dass mindestens ein Gegenargument oder ein Qualitätskriterium ausdrücklich vorkommt.");
+}
+
 function renderPortfolio() {
   const output = $("#portfolio-output");
   if (!output) return;
   const completedTasks = data.securityTasks.filter((item) => state.tasks[item.id]?.checked && state.tasks[item.id]?.text).length;
   const dilemmaCount = Object.values(state.dilemmas).filter((item) => item.reason).length;
-  const reflections = Object.entries(state.reflections).filter(([, value]) => value).slice(0, 6);
+  const reflections = Object.entries(state.reflections)
+    .filter(([key, value]) => value && !key.endsWith("-checked"))
+    .slice(0, 8);
+  const checkedTransfer = Object.keys(state.reflections).filter((key) => key.endsWith("-checked")).length;
 
   output.innerHTML = `
     <article>
@@ -431,7 +515,8 @@ function renderPortfolio() {
       <p>${dilemmaCount} von ${data.dilemmas.length} Dilemmata begründet.</p>
     </article>
     <article class="wide">
-      <h3>Reflexionen</h3>
+      <h3>Gewürdigte Reflexionen</h3>
+      <p>${checkedTransfer} Seminar-, Produktions- oder Rollenbeiträge wurden mit Feedback gewürdigt.</p>
       ${reflections.length ? reflections.map(([key, value]) => `<p><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</p>`).join("") : "<p>Noch keine Reflexionen eingetragen.</p>"}
     </article>
   `;
@@ -442,7 +527,7 @@ function updateProgress() {
   const notesDone = Math.min(state.notes.length / 3, 1);
   const ethicsDone = Object.values(state.dilemmas).filter((item) => item.reason).length / data.dilemmas.length;
   const researchDone = (state.methodsSolved ? 0.5 : 0) + (state.reflections.claim ? 0.5 : 0);
-  const reflectionDone = Math.min(Object.values(state.reflections).filter(Boolean).length / 4, 1);
+  const reflectionDone = Math.min(Object.keys(state.reflections).filter((key) => key.endsWith("-checked")).length / 4, 1);
   const score = Math.round(((tasksDone + notesDone + ethicsDone + researchDone + reflectionDone) / 5) * 100);
   $("#progress-value").textContent = `${score}%`;
   $("#progress-detail").textContent = score < 35
