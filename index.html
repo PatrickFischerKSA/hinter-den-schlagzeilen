@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hinter den Schlagzeilen | Interaktive Lernlandschaft</title>
+    <meta
+      name="description"
+      content="Interaktive Lernlandschaft zum Film Hinter den Schlagzeilen: Recherchemethoden, Medienethik, Inhaltsicherung und Rolle der Medien."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#start" aria-label="Hinter den Schlagzeilen">
+        <span class="brand-mark">HdS</span>
+        <span>Hinter den Schlagzeilen</span>
+      </a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#sehen">Film</a>
+        <a href="#sicherung">Sicherung</a>
+        <a href="#recherche">Recherche</a>
+        <a href="#ethik">Ethik</a>
+        <a href="#transfer">Transfer</a>
+      </nav>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Darstellung wechseln" title="Darstellung wechseln">◐</button>
+    </header>
+
+    <main id="start">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Medienbildung · Journalismus · Öffentlichkeit</p>
+          <h1>Wie entsteht Wahrheit, bevor sie zur Schlagzeile wird?</h1>
+          <p class="lead">
+            Diese Lernlandschaft macht aus dem Film eine investigative Werkstatt: genau hinschauen,
+            Aussagen sichern, Recherchewege prüfen, ethische Konflikte abwägen und die Bedeutung der
+            Medien für Demokratie und Alltag diskutieren.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#sehen">Film starten</a>
+            <a class="button" href="#sicherung">Quiz öffnen</a>
+            <button class="button" id="print-portfolio" type="button">Portfolio drucken</button>
+          </div>
+        </div>
+        <aside class="progress-panel" aria-labelledby="progress-title">
+          <p class="eyebrow">Fortschritt</p>
+          <h2 id="progress-title">Lernstand</h2>
+          <div class="progress-ring" aria-label="Fortschritt">
+            <span id="progress-value">0%</span>
+          </div>
+          <p id="progress-detail">Noch keine Station abgeschlossen.</p>
+          <button class="button subtle" id="reset-progress" type="button">Zurücksetzen</button>
+        </aside>
+      </section>
+
+      <section class="mission-band" aria-label="Arbeitsauftrag">
+        <article>
+          <strong>1. Sehen</strong>
+          <span>Filmbeobachtungen mit Zeitmarken sichern.</span>
+        </article>
+        <article>
+          <strong>2. Prüfen</strong>
+          <span>Fakten, Quellen, Stimmen und Leerstellen erkennen.</span>
+        </article>
+        <article>
+          <strong>3. Abwägen</strong>
+          <span>Medienethische Dilemmata begründet entscheiden.</span>
+        </article>
+        <article>
+          <strong>4. Weiterdenken</strong>
+          <span>Medien als Macht, Dienstleistung und Öffentlichkeit deuten.</span>
+        </article>
+      </section>
+
+      <section id="sehen" class="section video-section" aria-labelledby="sehen-title">
+        <div class="section-heading">
+          <p class="eyebrow">Filmraum</p>
+          <h2 id="sehen-title">Hinter den Schlagzeilen ansehen und aktiv notieren</h2>
+          <p>
+            Stoppe den Film an auffälligen Stellen. Notiere Zeitmarken, Beobachtungen, offene Fragen
+            und Belege. Die App speichert deine Einträge automatisch im Browser.
+          </p>
+        </div>
+        <div class="video-grid">
+          <div class="video-frame">
+            <video id="lesson-video" controls playsinline preload="metadata" crossorigin="anonymous">
+              <source src="https://www.dropbox.com/scl/fi/ru6qzoawaiov6lf0yne45/Hinter-den-Schlagzeilen.mp4?rlkey=095mgeasev3hlynvqjptuab5y&st=0ow020zz&raw=1" type="video/mp4">
+              <source src="assets/hinter-den-schlagzeilen.mp4" type="video/mp4">
+              Dein Browser kann dieses Video nicht direkt abspielen.
+            </video>
+            <div class="video-tools">
+              <button class="button small" data-jump="0" type="button">Zum Anfang</button>
+              <button class="button small" id="capture-time" type="button">Zeitmarke übernehmen</button>
+              <a class="button small" href="https://www.dropbox.com/scl/fi/ru6qzoawaiov6lf0yne45/Hinter-den-Schlagzeilen.mp4?rlkey=095mgeasev3hlynvqjptuab5y&st=0ow020zz&dl=0" target="_blank" rel="noreferrer">Original öffnen</a>
+            </div>
+          </div>
+          <aside class="notebook">
+            <h3>Beobachtungslog</h3>
+            <label>
+              Zeitmarke
+              <input id="note-time" type="text" placeholder="z. B. 03:42">
+            </label>
+            <label>
+              Beobachtung oder Aussage
+              <textarea id="note-text" rows="4" placeholder="Was passiert? Wer spricht? Welche Behauptung wird wichtig?"></textarea>
+            </label>
+            <label>
+              Kategorie
+              <select id="note-category">
+                <option>Recherche</option>
+                <option>Quelle</option>
+                <option>Ethik</option>
+                <option>Inszenierung</option>
+                <option>Rolle der Medien</option>
+                <option>Offene Frage</option>
+              </select>
+            </label>
+            <button class="button primary" id="add-note" type="button">Notiz hinzufügen</button>
+            <div class="note-list" id="note-list" aria-live="polite"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="sicherung" class="section" aria-labelledby="sicherung-title">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Inhaltssicherung</p>
+            <h2 id="sicherung-title">Sofortfeedback-Quiz zum Film</h2>
+            <p>
+              Die Fragen sichern zentrale Konzepte. Wähle eine Antwort und lies direkt, warum sie
+              tragfähig ist oder weshalb du genauer hinschauen solltest.
+            </p>
+          </div>
+          <button class="button" id="shuffle-quiz" type="button">Fragen mischen</button>
+        </div>
+        <div id="quiz-grid" class="quiz-grid"></div>
+      </section>
+
+      <section id="recherche" class="section dark-section" aria-labelledby="recherche-title">
+        <div class="section-heading">
+          <p class="eyebrow">Recherche-Labor</p>
+          <h2 id="recherche-title">Vom Hinweis zur belastbaren Aussage</h2>
+          <p>
+            Journalistische Recherche ist kein Bauchgefühl, sondern eine Methode. Ordne Arbeitsschritte,
+            prüfe Quellen und entwickle aus einer Behauptung eine überprüfbare Recherchefrage.
+          </p>
+        </div>
+        <div class="lab-grid">
+          <article class="tool-panel">
+            <h3>Recherchekette sortieren</h3>
+            <p>Bringe die Schritte in eine sinnvolle Reihenfolge.</p>
+            <div id="method-sorter" class="sorter"></div>
+            <button class="button primary" id="check-methods" type="button">Reihenfolge prüfen</button>
+            <p class="feedback" id="method-feedback" aria-live="polite"></p>
+          </article>
+          <article class="tool-panel">
+            <h3>Quellen-Triage</h3>
+            <p>Welche Quelle wäre für eine heikle Recherche besonders belastbar?</p>
+            <div id="source-lab" class="choice-stack"></div>
+          </article>
+          <article class="tool-panel wide">
+            <h3>Behauptung schärfen</h3>
+            <label>
+              Ausgangsbehauptung aus dem Film oder aus einer aktuellen Debatte
+              <textarea id="claim-input" rows="3" placeholder="z. B. Jugendliche informieren sich nur noch über Social Media."></textarea>
+            </label>
+            <div class="claim-actions">
+              <button class="button primary" id="build-research" type="button">Rechercheplan erzeugen</button>
+              <button class="button" id="copy-template" type="button">Vorlage einsetzen</button>
+            </div>
+            <div id="research-plan" class="research-plan"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="ethik" class="section" aria-labelledby="ethik-title">
+        <div class="section-heading">
+          <p class="eyebrow">Medienethik</p>
+          <h2 id="ethik-title">Dilemmata entscheiden, begründen, revidieren</h2>
+          <p>
+            Redaktionelle Entscheidungen sind selten bequem. Ziehe den Regler, wähle eine Position
+            und begründe deine Abwägung zwischen öffentlichem Interesse, Schutz von Personen,
+            Genauigkeit, Tempo und Wirkung.
+          </p>
+        </div>
+        <div id="dilemma-grid" class="dilemma-grid"></div>
+      </section>
+
+      <section id="transfer" class="section transfer-section" aria-labelledby="transfer-title">
+        <div class="section-heading">
+          <p class="eyebrow">Bedeutung der Medien</p>
+          <h2 id="transfer-title">Weiterführende Fragen und produktive Aufgaben</h2>
+          <p>
+            Nach der Sicherung kommt die Deutung: Was leisten Medien für Gesellschaften, wo gefährden
+            sie Vertrauen, und wie verändert sich Journalismus in digitalen Öffentlichkeiten?
+          </p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Transferbereiche">
+          <button class="tab is-active" type="button" role="tab" data-tab="seminar">Seminarfragen</button>
+          <button class="tab" type="button" role="tab" data-tab="produktion">Produktionsauftrag</button>
+          <button class="tab" type="button" role="tab" data-tab="debate">Redaktionskonferenz</button>
+        </div>
+        <div class="tab-panel is-active" id="tab-seminar"></div>
+        <div class="tab-panel" id="tab-produktion"></div>
+        <div class="tab-panel" id="tab-debate"></div>
+      </section>
+
+      <section class="section portfolio-section" aria-labelledby="portfolio-title">
+        <div class="section-heading split">
+          <div>
+            <p class="eyebrow">Portfolio</p>
+            <h2 id="portfolio-title">Deine gesicherten Ergebnisse</h2>
+            <p>Hier entsteht eine kompakte Übersicht aus Notizen, Quizstand und Reflexionen.</p>
+          </div>
+          <button class="button primary" id="refresh-portfolio" type="button">Portfolio aktualisieren</button>
+        </div>
+        <div id="portfolio-output" class="portfolio-output"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Interaktive Lernlandschaft zu Recherche, Medienethik und Öffentlichkeit.</p>
+      <a href="#start">Nach oben</a>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
