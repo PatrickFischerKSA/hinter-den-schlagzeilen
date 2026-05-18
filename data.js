@@ -1,156 +1,84 @@
 window.LEARNING_DATA = {
-  quiz: [
+  securityTasks: [
     {
       id: "q1",
       type: "Grundverständnis",
-      question: "Was meint der Titel «Hinter den Schlagzeilen» am treffendsten?",
-      options: [
-        "Schlagzeilen sind nur der sichtbare Endpunkt eines längeren Recherche- und Auswahlprozesses.",
-        "Schlagzeilen entstehen vor allem, damit möglichst viele Menschen klicken.",
-        "Die wichtigste journalistische Arbeit besteht darin, eine pointierte Überschrift zu formulieren.",
-        "Gute Medien vermeiden jede Zuspitzung vollständig."
-      ],
-      answer: 0,
-      feedback: [
-        "Genau. Der Film lädt dazu ein, nicht nur das fertige Produkt zu sehen, sondern Arbeitsschritte, Entscheidungen und Verantwortung dahinter.",
-        "Klicklogik kann eine Rolle spielen, erklärt aber nicht das Ganze. Recherche, Prüfung, Auswahl und Verantwortung sind zentraler.",
-        "Die Überschrift ist wichtig, aber sie steht am Ende eines Prozesses, nicht an seinem Anfang.",
-        "Zuspitzung ist nicht grundsätzlich falsch. Entscheidend ist, ob sie korrekt, fair und nicht irreführend ist."
-      ],
-      followUp: "Suche im Film eine Stelle, an der sichtbar wird, dass eine veröffentlichte Nachricht vorher ausgewählt, geprüft oder gewichtet wurde."
+      question: "Erkläre den Titel «Hinter den Schlagzeilen» als journalistisches Programm. Was soll hinter der sichtbaren Nachricht erkennbar werden?",
+      prompt: "Formuliere 5-7 Sätze. Beziehe mindestens eine konkrete Filmszene oder Beobachtung ein.",
+      criteria: ["Titel gedeutet", "konkreter Filmbeleg", "Rechercheprozess erwähnt", "redaktionelle Auswahl erklärt"],
+      keywords: ["recherche", "auswahl", "prüfung", "quelle", "redaktion", "beleg", "entscheidung", "öffentlichkeit"],
+      horizon: "Eine starke Antwort zeigt: Schlagzeilen sind nicht einfach Fakten in Kurzform, sondern das Ergebnis von Recherche, Auswahl, Prüfung, Zuspitzung und Verantwortung. Hinter der Nachricht stehen Quellen, Interessen, redaktionelle Routinen und ethische Entscheidungen.",
+      followUp: "Welche Stelle im Film eignet sich am besten, um diesen Prozess sichtbar zu machen? Notiere eine Zeitmarke."
     },
     {
       id: "q2",
       type: "Recherche",
-      question: "Welche Handlung ist bei einer heiklen Recherche am ehesten ein Zeichen professioneller Sorgfalt?",
-      options: [
-        "Eine einzelne plausible Quelle verwenden, wenn sie gut klingt.",
-        "Mehrere voneinander unabhängige Quellen prüfen und Betroffenen Gelegenheit zur Stellungnahme geben.",
-        "Mit der Veröffentlichung warten, bis alle Beteiligten völlig einverstanden sind.",
-        "Die emotional stärkste Aussage wählen, weil sie Aufmerksamkeit erzeugt."
-      ],
-      answer: 1,
-      feedback: [
-        "Plausibilität genügt nicht. Gerade gut klingende Geschichten brauchen Gegenprüfung.",
-        "Richtig. Unabhängigkeit, Gegencheck und Stellungnahme schützen vor Fehlern und unfairer Darstellung.",
-        "Einverständnis aller Betroffenen ist nicht immer erreichbar. Entscheidend ist faire, sorgfältige und begründbare Arbeit.",
-        "Emotion kann erzählen helfen, ersetzt aber keine Prüfung und kann manipulativ werden."
-      ],
-      followUp: "Welche Personen oder Dokumente müssten in einer Recherche aus dem Film zusätzlich befragt oder geprüft werden?"
+      question: "Rekonstruiere eine Recherchekette aus dem Film: Von welchem Hinweis geht sie aus, welche Prüfbewegung folgt, und wann wäre eine Aussage veröffentlichungsreif?",
+      prompt: "Arbeite in drei Schritten: Hinweis, Gegenprüfung, veröffentlichbare Aussage.",
+      criteria: ["Hinweis benannt", "Gegenprüfung beschrieben", "unabhängige Quelle bedacht", "Grenze des Wissens markiert"],
+      keywords: ["hinweis", "gegencheck", "unabhängig", "dokument", "interview", "stellungnahme", "gesichert", "unsicher"],
+      horizon: "Professionelle Recherche macht aus einem Hinweis erst nach Gegenprüfung eine belastbare Aussage. Wichtig sind unabhängige Quellen, Dokumente oder Daten, die Konfrontation Betroffener und eine klare Trennung zwischen gesichertem Wissen und offener Vermutung.",
+      followUp: "Welche zusätzliche Quelle würdest du suchen, um diese Recherche robuster zu machen?"
     },
     {
       id: "q3",
       type: "Quellenkritik",
-      question: "Was ist der wichtigste Unterschied zwischen Quelle und Beleg?",
-      options: [
-        "Eine Quelle ist immer objektiv, ein Beleg immer subjektiv.",
-        "Eine Quelle liefert Material; ein Beleg stützt eine konkrete Aussage nachvollziehbar.",
-        "Ein Beleg ist nur dann gültig, wenn er aus Social Media stammt.",
-        "Quelle und Beleg bedeuten im Journalismus dasselbe."
-      ],
-      answer: 1,
-      feedback: [
-        "Keine Quelle ist automatisch objektiv. Auch Dokumente, Daten oder Expertinnen müssen eingeordnet werden.",
-        "Ja. Aus Quellen werden erst durch genaue Zuordnung, Kontext und Prüfung belastbare Belege.",
-        "Social Media kann ein Hinweis oder Material sein, ist aber nicht automatisch belastbar.",
-        "Die Begriffe hängen zusammen, sind aber nicht identisch."
-      ],
-      followUp: "Formuliere zu einer Filmszene: Welche Quelle liegt vor, und welche Aussage kann sie wirklich belegen?"
+      question: "Unterscheide an einem Beispiel aus dem Film zwischen Quelle, Beleg und Deutung.",
+      prompt: "Schreibe drei kurze Abschnitte: Was ist die Quelle? Was belegt sie wirklich? Welche Deutung wäre vorsichtig oder problematisch?",
+      criteria: ["Quelle präzise benannt", "Beleg begrenzt formuliert", "Deutung getrennt", "Überinterpretation vermieden"],
+      keywords: ["quelle", "beleg", "deutung", "aussage", "kontext", "interesse", "perspektive", "prüfen"],
+      horizon: "Eine Quelle liefert Material, aber sie belegt nie automatisch jede daraus abgeleitete Behauptung. Gute Analyse fragt: Wer spricht? In welchem Kontext? Was lässt sich daraus tatsächlich schließen, und wo beginnt Interpretation?",
+      followUp: "Wo könnte der Film selbst eine Deutung nahelegen, die man kritisch gegenprüfen sollte?"
     },
     {
       id: "q4",
       type: "Medienethik",
-      question: "Wann ist eine Veröffentlichung trotz möglicher Belastung für Einzelpersonen eher gerechtfertigt?",
-      options: [
-        "Wenn die Geschichte sehr unterhaltsam ist.",
-        "Wenn ein erhebliches öffentliches Interesse besteht und die Darstellung verhältnismäßig bleibt.",
-        "Wenn andere Medien wahrscheinlich ebenfalls darüber berichten.",
-        "Wenn die betroffene Person nicht erreichbar war."
-      ],
-      answer: 1,
-      feedback: [
-        "Unterhaltung allein rechtfertigt keinen Eingriff in Persönlichkeitsrechte.",
-        "Richtig. Öffentliches Interesse, Verhältnismäßigkeit, Wahrheitsgehalt und Fairness müssen zusammen gedacht werden.",
-        "Das Verhalten anderer Medien ersetzt keine eigene ethische Prüfung.",
-        "Nicht-Erreichbarkeit kann vorkommen, macht eine Veröffentlichung aber nicht automatisch fair."
-      ],
-      followUp: "Nenne eine Szene oder Situation, in der Schutz von Personen und Informationsinteresse miteinander kollidieren könnten."
+      question: "Entwirf eine medienethische Abwägung: Wann darf eine Redaktion belastende Informationen veröffentlichen, obwohl Personen dadurch Schaden nehmen könnten?",
+      prompt: "Begründe mit öffentlichem Interesse, Verhältnismäßigkeit, Schutz der Person und Möglichkeit zur Stellungnahme.",
+      criteria: ["öffentliches Interesse geprüft", "Personenschutz berücksichtigt", "Verhältnismäßigkeit abgewogen", "Stellungnahme erwähnt"],
+      keywords: ["öffentliches interesse", "privatsphäre", "verhältnismäßig", "stellungnahme", "schutz", "schaden", "fair", "personen"],
+      horizon: "Eine überzeugende Abwägung trennt Neugier von öffentlichem Interesse. Sie fragt, ob die Information für das Verständnis eines relevanten Problems nötig ist, ob Betroffene fair gehört wurden und ob Details weggelassen werden können, ohne den Kern zu verfälschen.",
+      followUp: "Formuliere eine alternative, schonendere Veröffentlichungsform für denselben Sachverhalt."
     },
     {
       id: "q5",
       type: "Medienwirkung",
-      question: "Warum sind Medien für demokratische Gesellschaften mehr als Informationslieferanten?",
-      options: [
-        "Sie entscheiden allein, was politisch richtig ist.",
-        "Sie schaffen Öffentlichkeit, kontrollieren Macht, ordnen Konflikte und ermöglichen gemeinsame Debatten.",
-        "Sie ersetzen Gerichte, Parlamente und Schulen.",
-        "Sie sollen vor allem neutrale Unterhaltung ohne gesellschaftliche Wirkung liefern."
-      ],
-      answer: 1,
-      feedback: [
-        "Medien sollen nicht allein entscheiden, was richtig ist. Sie sollen informieren, prüfen, einordnen und Kritik ermöglichen.",
-        "Genau. Medien strukturieren Öffentlichkeit und machen Macht, Interessen und Konflikte sichtbar.",
-        "Medien ersetzen Institutionen nicht, können sie aber beobachten und kritisieren.",
-        "Auch Unterhaltung kann wirken. Journalismus hat darüber hinaus eine öffentliche Aufgabe."
-      ],
-      followUp: "Welche Funktion der Medien wird im Film besonders stark sichtbar: Information, Kritik, Kontrolle, Orientierung oder Forum?"
+      question: "Beurteile die demokratische Funktion von Medien im Film. Sind Medien hier eher Kontrollinstanz, Orientierungsangebot, Forum oder Machtfaktor?",
+      prompt: "Wähle nicht nur einen Begriff. Gewichte mindestens zwei Funktionen und zeige die Spannung zwischen ihnen.",
+      criteria: ["mindestens zwei Medienfunktionen", "Gewichtung vorgenommen", "Spannung beschrieben", "Filmbezug hergestellt"],
+      keywords: ["kontrolle", "orientierung", "forum", "macht", "öffentlichkeit", "demokratie", "kritik", "vertrauen"],
+      horizon: "Medien informieren nicht nur. Sie schaffen Öffentlichkeit, kontrollieren Macht, geben Orientierung und werden selbst zu Akteuren mit Einfluss. Eine starke Antwort erkennt diese Doppelrolle: Medien beobachten Macht und üben zugleich selbst Macht aus.",
+      followUp: "Welche Medienfunktion erscheint dir heute besonders gefährdet? Begründe mit einem aktuellen Beispiel."
     },
     {
       id: "q6",
       type: "Darstellung",
-      question: "Welche Frage hilft am besten, journalistische Inszenierung kritisch zu analysieren?",
-      options: [
-        "Wirkt die Szene teuer produziert?",
-        "Welche Auswahl von Bildern, Tönen und Stimmen lenkt meine Deutung?",
-        "Sind alle Aussagen im gleichen Tempo gesprochen?",
-        "Gefällt mir die Moderatorin oder der Moderator?"
-      ],
-      answer: 1,
-      feedback: [
-        "Produktionsqualität kann Wirkung haben, beantwortet aber nicht die zentrale Analysefrage.",
-        "Richtig. Journalismus zeigt nie alles. Auswahl und Montage prägen Bedeutung.",
-        "Tempo kann eine Rolle spielen, ist aber nur ein Detail.",
-        "Sympathie ist eine Reaktion, aber keine tragfähige Analyse."
-      ],
-      followUp: "Wähle eine Filmminute und beschreibe, wie Bild, Ton, Schnitt und Sprache deine Wahrnehmung steuern."
+      question: "Analysiere eine Minute Filmgestaltung: Wie lenken Bild, Ton, Schnitt und Sprache deine Deutung journalistischer Arbeit?",
+      prompt: "Nutze eine konkrete Zeitmarke und beschreibe Wirkung, nicht nur Inhalt.",
+      criteria: ["Zeitmarke genannt", "Bild analysiert", "Ton oder Schnitt analysiert", "Wirkung auf Deutung erklärt"],
+      keywords: ["bild", "ton", "schnitt", "sprache", "wirkung", "montage", "perspektive", "deutung"],
+      horizon: "Filmische Mittel sind keine bloße Verpackung. Bildausschnitt, Reihenfolge, Musik, Pausen, Off-Kommentar und Schnittgeschwindigkeit entscheiden mit, ob Journalismus ruhig, hektisch, glaubwürdig, mächtig oder verletzlich erscheint.",
+      followUp: "Wie könnte dieselbe Szene anders montiert werden, um eine andere Wirkung zu erzeugen?"
     },
     {
       id: "q7",
       type: "Fehlerkultur",
-      question: "Was wäre eine professionelle Reaktion, wenn nach Veröffentlichung ein relevanter Fehler entdeckt wird?",
-      options: [
-        "Den Fehler still löschen, damit kein Vertrauensverlust entsteht.",
-        "Den Fehler transparent korrigieren und erklären, was geändert wurde.",
-        "Die Kritik ignorieren, wenn der Beitrag insgesamt gut gemeint war.",
-        "Den Beitrag sofort komplett zurückziehen, unabhängig von Art und Größe des Fehlers."
-      ],
-      answer: 1,
-      feedback: [
-        "Stilles Löschen kann Vertrauen stärker beschädigen, weil es Korrekturen unsichtbar macht.",
-        "Ja. Korrekturtransparenz ist Teil journalistischer Glaubwürdigkeit.",
-        "Gute Absichten ersetzen keine Verantwortung für Genauigkeit.",
-        "Manchmal ist Rückzug nötig, aber nicht jeder Fehler verlangt denselben Schritt."
-      ],
-      followUp: "Wie sollte eine Redaktion sichtbar machen, dass sie aus einem Fehler gelernt hat?"
+      question: "Entwickle eine professionelle Fehlerkultur für eine Redaktion: Was passiert, wenn nach Veröffentlichung ein relevanter Fehler entdeckt wird?",
+      prompt: "Beschreibe konkrete Schritte von Prüfung über Korrektur bis Vertrauensarbeit.",
+      criteria: ["Fehlerprüfung", "transparente Korrektur", "Verantwortung übernommen", "Lernschritt benannt"],
+      keywords: ["korrektur", "transparent", "fehler", "vertrauen", "prüfung", "verantwortung", "richtigstellung", "lernen"],
+      horizon: "Glaubwürdigkeit entsteht nicht dadurch, dass Fehler unsichtbar bleiben. Professionelle Redaktionen prüfen Kritik, korrigieren nachvollziehbar, erklären Änderungen und verbessern Abläufe, damit derselbe Fehler nicht wiederkehrt.",
+      followUp: "Sollten Korrekturen prominent sichtbar sein oder am Ende des Artikels stehen? Begründe."
     },
     {
       id: "q8",
       type: "Digitale Öffentlichkeit",
-      question: "Was verändert sich durch digitale Plattformen für journalistische Arbeit besonders stark?",
-      options: [
-        "Recherche wird überflüssig, weil Informationen überall verfügbar sind.",
-        "Tempo, Reichweite, Konkurrenz um Aufmerksamkeit und Rückmeldungen des Publikums nehmen zu.",
-        "Ethik spielt online keine Rolle mehr.",
-        "Nur gedruckte Medien können Vertrauen herstellen."
-      ],
-      answer: 1,
-      feedback: [
-        "Gerade weil Informationen überall verfügbar sind, wird Prüfung wichtiger.",
-        "Richtig. Digitale Öffentlichkeit erhöht Tempo und Sichtbarkeit, aber auch Fehler- und Empörungsrisiken.",
-        "Ethik wird online nicht kleiner, sondern oft komplizierter.",
-        "Vertrauen hängt nicht am Trägermedium, sondern an Arbeitsweise, Transparenz und Qualität."
-      ],
-      followUp: "Welche digitale Herausforderung erkennt man im Film oder in eurem eigenen Medienalltag besonders deutlich?"
+      question: "Diskutiere, wie digitale Plattformen journalistische Qualität zugleich erleichtern und gefährden.",
+      prompt: "Arbeite mit einer Doppelthese: ein Gewinn, ein Risiko, eine Konsequenz für Rechercheethik.",
+      criteria: ["Gewinn digitaler Öffentlichkeit", "Risiko benannt", "Konsequenz für Recherche", "eigene Position"],
+      keywords: ["tempo", "reichweite", "plattform", "aufmerksamkeit", "feedback", "desinformation", "prüfung", "algorithmus"],
+      horizon: "Digitale Plattformen erleichtern Zugang, Quellenkontakt und Reichweite. Gleichzeitig erhöhen sie Tempo, Konkurrenzdruck, Emotionalisierung und Fehlerfolgen. Daraus folgt nicht weniger, sondern mehr Bedarf an Transparenz, Gegenprüfung und redaktioneller Verantwortung.",
+      followUp: "Welche Regel würdest du einer Redaktion für Social-Media-Veröffentlichungen geben?"
     }
   ],
   methods: [

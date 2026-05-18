@@ -6,7 +6,7 @@ Interaktive Lernlandschaft zum Film `Hinter den Schlagzeilen`.
 
 - Videoeinbindung über den bereitgestellten Dropbox-Link
 - Filmnotizen mit Zeitmarken
-- Inhaltsquiz mit Sofortfeedback
+- offene Analyseaufgaben mit Kriterien-Sofortfeedback
 - Recherche-Labor mit Methodenordnung, Quellen-Triage und Rechercheplan
 - Medienethik-Dilemmata mit Begründungsfeldern
 - Transferfragen, Produktionsaufträge und Portfolio-Druckansicht

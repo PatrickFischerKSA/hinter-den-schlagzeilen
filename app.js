@@ -1,7 +1,8 @@
-const STORAGE_KEY = "hinter-den-schlagzeilen-state-v2";
+const STORAGE_KEY = "hinter-den-schlagzeilen-state-v3";
 const data = window.LEARNING_DATA;
 
 const state = loadState();
+normalizeState();
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
 
@@ -9,14 +10,14 @@ function loadState() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
       notes: [],
-      quiz: {},
+      tasks: {},
       dilemmas: {},
       reflections: {},
       methodsSolved: false,
       sourceChoices: {}
     };
   } catch {
-    return { notes: [], quiz: {}, dilemmas: {}, reflections: {}, methodsSolved: false, sourceChoices: {} };
+    return { notes: [], tasks: {}, dilemmas: {}, reflections: {}, methodsSolved: false, sourceChoices: {} };
   }
 }
 
@@ -125,55 +126,104 @@ function initNotes() {
   renderNotes();
 }
 
-function renderQuiz(items = data.quiz) {
-  const grid = $("#quiz-grid");
+function normalizeState() {
+  state.notes ||= [];
+  state.tasks ||= {};
+  state.dilemmas ||= {};
+  state.reflections ||= {};
+  state.sourceChoices ||= {};
+}
+
+function scoreTask(text, item) {
+  const normalized = text.toLowerCase();
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  const keywordHits = item.keywords.filter((keyword) => normalized.includes(keyword)).length;
+  const signals = [
+    { label: "ausreichend ausführlich", passed: wordCount >= 55 },
+    { label: "zentrale Begriffe verwendet", passed: keywordHits >= 3 },
+    ...item.criteria.map((criterion) => ({
+      label: criterion,
+      passed: normalized.includes(criterion.toLowerCase().split(" ")[0]) || keywordHits >= 4
+    }))
+  ];
+  const passed = signals.filter((signal) => signal.passed).length;
+  return { signals, passed, wordCount, keywordHits };
+}
+
+function renderTasks(items = data.securityTasks) {
+  const grid = $("#task-grid");
   if (!grid) return;
   grid.innerHTML = items.map((item, itemIndex) => {
-    const selected = state.quiz[item.id]?.selected;
-    const feedback = selected === undefined ? "" : `
-      <div class="answer-feedback ${selected === item.answer ? "correct" : "wrong"}">
-        <strong>${selected === item.answer ? "Richtig" : "Noch nicht ganz"}</strong>
-        <p>${item.feedback[selected]}</p>
-        <p class="follow-up">${item.followUp}</p>
+    const saved = state.tasks[item.id] || { text: "", checked: false };
+    const result = saved.checked ? scoreTask(saved.text, item) : null;
+    const feedback = result ? `
+      <div class="answer-feedback ${result.passed >= 5 ? "correct" : "develop"}">
+        <strong>${result.passed >= 5 ? "Tragfähige Antwort" : "Weiter schärfen"}</strong>
+        <p>${result.wordCount} Wörter, ${result.keywordHits} passende Fachsignale. Die automatische Prüfung ist kein Notenersatz, aber ein Arbeitsradar.</p>
+        <ul class="criteria-list">
+          ${result.signals.map((signal) => (
+            "<li class=\"" + (signal.passed ? "met" : "") + "\">" +
+            (signal.passed ? "✓" : "○") + " " + escapeHtml(signal.label) +
+            "</li>"
+          )).join("")}
+        </ul>
+        <details>
+          <summary>Musterhorizont anzeigen</summary>
+          <p>${escapeHtml(item.horizon)}</p>
+        </details>
+        <p class="follow-up">${escapeHtml(item.followUp)}</p>
       </div>
-    `;
+    ` : "";
     return `
-      <article class="quiz-card" style="--delay:${itemIndex * 40}ms">
+      <article class="task-card" style="--delay:${itemIndex * 40}ms">
         <span class="tag">${item.type}</span>
         <h3>${escapeHtml(item.question)}</h3>
-        <div class="option-list">
-          ${item.options.map((option, index) => `
-            <button
-              class="${selected === index ? "is-selected" : ""} ${selected !== undefined && index === item.answer ? "is-answer" : ""}"
-              type="button"
-              data-quiz="${item.id}"
-              data-answer="${index}"
-            >
-              <span>${String.fromCharCode(65 + index)}</span>
-              ${escapeHtml(option)}
-            </button>
-          `).join("")}
+        <p>${escapeHtml(item.prompt)}</p>
+        <textarea rows="7" data-task-text="${item.id}" placeholder="Antwort mit Filmbeleg, Begriffen und eigener Abwägung">${escapeHtml(saved.text)}</textarea>
+        <div class="task-actions">
+          <button class="button primary small" type="button" data-task-check="${item.id}">Antwort prüfen</button>
+          <button class="button small" type="button" data-task-horizon="${item.id}">Musterhorizont</button>
         </div>
         ${feedback}
       </article>
     `;
   }).join("");
 
-  $$("[data-quiz]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.quiz[button.dataset.quiz] = { selected: Number(button.dataset.answer) };
+  $$("[data-task-text]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const id = field.dataset.taskText;
+      state.tasks[id] = { ...(state.tasks[id] || {}), text: field.value, checked: false };
       saveState();
-      renderQuiz(items);
+    });
+  });
+
+  $$("[data-task-check]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.taskCheck;
+      const text = $(`[data-task-text="${id}"]`).value.trim();
+      state.tasks[id] = { text, checked: true };
+      saveState();
+      renderTasks(items);
       renderPortfolio();
+    });
+  });
+
+  $$("[data-task-horizon]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.taskHorizon;
+      const text = $(`[data-task-text="${id}"]`).value.trim();
+      state.tasks[id] = { text, checked: true };
+      saveState();
+      renderTasks(items);
     });
   });
 }
 
-function initQuiz() {
-  renderQuiz();
-  $("#shuffle-quiz")?.addEventListener("click", () => {
-    const shuffled = [...data.quiz].sort(() => Math.random() - 0.5);
-    renderQuiz(shuffled);
+function initTasks() {
+  renderTasks();
+  $("#shuffle-tasks")?.addEventListener("click", () => {
+    const shuffled = [...data.securityTasks].sort(() => Math.random() - 0.5);
+    renderTasks(shuffled);
   });
 }
 
@@ -357,14 +407,15 @@ function renderTransfer() {
 function renderPortfolio() {
   const output = $("#portfolio-output");
   if (!output) return;
-  const correct = data.quiz.filter((item) => state.quiz[item.id]?.selected === item.answer).length;
+  const completedTasks = data.securityTasks.filter((item) => state.tasks[item.id]?.checked && state.tasks[item.id]?.text).length;
   const dilemmaCount = Object.values(state.dilemmas).filter((item) => item.reason).length;
   const reflections = Object.entries(state.reflections).filter(([, value]) => value).slice(0, 6);
 
   output.innerHTML = `
     <article>
-      <h3>Quiz</h3>
-      <p>${correct} von ${data.quiz.length} Konzeptfragen korrekt beantwortet.</p>
+      <h3>Analyseaufgaben</h3>
+      <p>${completedTasks} von ${data.securityTasks.length} offenen Sicherungsaufgaben bearbeitet.</p>
+      ${data.securityTasks.filter((item) => state.tasks[item.id]?.text).slice(0, 4).map((item) => `<p><strong>${escapeHtml(item.type)}:</strong> ${escapeHtml(state.tasks[item.id].text)}</p>`).join("")}
     </article>
     <article>
       <h3>Filmnotizen</h3>
@@ -387,15 +438,15 @@ function renderPortfolio() {
 }
 
 function updateProgress() {
-  const quizDone = Object.keys(state.quiz).length / data.quiz.length;
+  const tasksDone = data.securityTasks.filter((item) => state.tasks[item.id]?.checked && state.tasks[item.id]?.text).length / data.securityTasks.length;
   const notesDone = Math.min(state.notes.length / 3, 1);
   const ethicsDone = Object.values(state.dilemmas).filter((item) => item.reason).length / data.dilemmas.length;
   const researchDone = (state.methodsSolved ? 0.5 : 0) + (state.reflections.claim ? 0.5 : 0);
   const reflectionDone = Math.min(Object.values(state.reflections).filter(Boolean).length / 4, 1);
-  const score = Math.round(((quizDone + notesDone + ethicsDone + researchDone + reflectionDone) / 5) * 100);
+  const score = Math.round(((tasksDone + notesDone + ethicsDone + researchDone + reflectionDone) / 5) * 100);
   $("#progress-value").textContent = `${score}%`;
   $("#progress-detail").textContent = score < 35
-    ? "Starte mit Filmnotizen und Quiz."
+    ? "Starte mit Filmnotizen und Analyseaufgaben."
     : score < 75
       ? "Guter Arbeitsstand. Recherche und Ethik vertiefen."
       : "Sehr weit. Portfolio prüfen und Transferfragen schärfen.";
@@ -420,7 +471,7 @@ function initControls() {
 initControls();
 initVideoTools();
 initNotes();
-initQuiz();
+initTasks();
 initResearchLab();
 renderDilemmas();
 renderTransfer();
